@@ -1,0 +1,8 @@
+{
+  "name": "NeuronAds OS",
+  "description": "Sistema operativo de gestión de agencia AdTech con estética de red sináptica e integración de frecuencias vibracionales para optimización de campañas.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
