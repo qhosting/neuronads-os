@@ -10,12 +10,12 @@ RUN apk add --no-cache libc6-compat curl
 WORKDIR /app
 
 # --- INSTALACIÓN DE DEPENDENCIAS ---
-# Copiamos solo los manifiestos primero para aprovechar la caché de Docker
-COPY package.json package-lock.json* ./
+# Copiamos el manifiesto de dependencias
+COPY package.json ./
 
-# Instalación limpia de dependencias de producción
-# Se omiten devDependencies para reducir el peso de la sinapsis del contenedor
-RUN npm ci --only=production
+# Instalación de dependencias de producción
+# Se usa 'npm install --omit=dev' porque no hay un archivo package-lock.json presente
+RUN npm install --omit=dev
 
 # --- DESPLIEGUE DE CÓDIGO ---
 # Copiamos el resto de los módulos y el código fuente
@@ -28,11 +28,6 @@ RUN chown -R node:node /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Variables de enlace (se recomienda pasarlas vía docker-compose o secretos)
-# API_KEY se inyecta externamente
-# DATABASE_URL se inyecta externamente
-# REDIS_URL se inyecta externamente
-
 # --- OPERATIVIDAD ---
 # Exponer el puerto de comunicación del Nodo Central
 EXPOSE 3000
@@ -41,7 +36,6 @@ EXPOSE 3000
 USER node
 
 # Healthcheck: Verificación periódica del estado del Córtex Central
-# Si el endpoint /api/health falla, el contenedor se marcará como UNHEALTHY
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
