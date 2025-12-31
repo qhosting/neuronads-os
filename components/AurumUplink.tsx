@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -82,7 +81,7 @@ const AurumUplink: React.FC<{ onConnect: () => void, isConnected: boolean }> = (
           
           <div className="space-y-5 flex-1">
              <IntegrationItem icon={<Repeat size={14} />} name="n8n Workflow Engine" status="CONNECTED" url="v3.aurum-n8n.io" latency="14ms" />
-             <IntegrationItem icon={<MessageSquare size={14} />} name="Chatwoot Omnihub" status="CONNECTED" url="chat.neuronads.com" latency="32ms" />
+             <IntegrationItem icon={<MessageSquare size={14} />} name="Chatwoot Omnihub" status="CONNECTED" url="chat.neuronads.mx" latency="32ms" />
              <IntegrationItem icon={<Database size={14} />} name="Odoo ERP Link" status="SYNCING" url="erp.holding.sys" latency="156ms" />
           </div>
 

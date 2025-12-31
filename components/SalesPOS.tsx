@@ -22,7 +22,7 @@ import { ServiceItem, Transaction } from '../types';
 
 const CATALOG: ServiceItem[] = [
   { id: 's1', name: 'Neural Branding Pack', description: 'Identidad visual basada en arquetipos cuánticos.', price: 1500, category: 'BRANDING', billingCycle: 'ONCE' },
-  { id: 's2', name: 'Synaptic Ads Scaling', description: 'Escalamiento vertical de campañas Meta/Google.', price: 2500, category: 'ADS', billingCycle: 'MONTHLY' },
+  { id: 's2', name: 'Synaptic Ads Scaling', description: 'Escalamiento dinámico de campañas en Meta y Google Ads, con enfoque en la optimización predictiva de ROI basada en IA.', price: 2500, category: 'ADS', billingCycle: 'MONTHLY' },
   { id: 's3', name: 'AI Cortex Integration', description: 'Implementación de LLMs personalizados en flujos.', price: 4000, category: 'AI', billingCycle: 'ONCE' },
   { id: 's4', name: 'Viral Inoculation Strategy', description: 'Diseño de contenido con gancho neural.', price: 1200, category: 'CONSULTING', billingCycle: 'MONTHLY' },
 ];

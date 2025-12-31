@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -27,7 +26,7 @@ const DEFAULT_PDF_CONFIG: PdfTemplateConfig = {
   accentColor: '#22d3ee',
   companyName: 'NEURONADS MASTER NODE',
   companySlogan: 'NEURAL MARKETING & ADTECH SOLUTIONS',
-  companyEmail: 'finance@neuronads.com',
+  companyEmail: 'finance@neuronads.mx',
   companyAddress: 'AURUM DATA TOWER, LEVEL 88',
   companyTaxId: 'TAX-SYNAPSE-2024-X',
   authorizedSignature: 'DIRECTOR DE OPERACIONES NEURALES',

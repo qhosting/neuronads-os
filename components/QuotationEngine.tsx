@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -42,7 +41,7 @@ const DEFAULT_PDF_CONFIG: PdfTemplateConfig = {
   accentColor: '#0891b2',
   companyName: 'NEURONADS AGENCY',
   companySlogan: 'INTELIGENCIA DE MERCADO & ADTECH SOLUTIONS',
-  companyEmail: 'ops@neuronads.com',
+  companyEmail: 'ops@neuronads.mx',
   companyAddress: 'FINANCIAL DISTRICT, CORPORATE ALPHA, LEVEL 12',
   companyTaxId: 'ID-PROC-2024-ADTECH',
   authorizedSignature: 'DIRECCIÓN DE OPERACIONES',

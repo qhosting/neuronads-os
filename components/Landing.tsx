@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -57,7 +56,7 @@ const Landing: React.FC<LandingProps> = ({ onEnterLogin }) => {
     let role: UserRole = UserRole.CLIENT;
     const identifier = nodeId.toLowerCase();
     
-    if (identifier.includes('ceo') || identifier.includes('master') || identifier === 'admin@neuronads.com') {
+    if (identifier.includes('ceo') || identifier.includes('master') || identifier === 'admin@neuronads.mx') {
       role = UserRole.CEO;
     } else if (identifier.includes('staff') || identifier.includes('op') || identifier.includes('agent')) {
       role = UserRole.STAFF;
@@ -99,7 +98,7 @@ const Landing: React.FC<LandingProps> = ({ onEnterLogin }) => {
             <div className="w-10 h-10 bg-cyan-500/10 rounded-xl flex items-center justify-center border border-cyan-500/20 group-hover:border-cyan-500/50 transition-all shadow-[0_0_20px_rgba(34,211,238,0.1)]">
               <Brain size={22} className="text-cyan-400" />
             </div>
-            <span className="font-orbitron font-black text-xl tracking-tighter text-white">NEURONADS<span className="text-cyan-500">.</span>OS</span>
+            <span className="font-orbitron font-black text-xl tracking-tighter text-white">NEURONADS<span className="text-cyan-500">.</span>MX</span>
           </div>
           
           <div className="hidden lg:flex items-center gap-10">
@@ -289,7 +288,7 @@ const Landing: React.FC<LandingProps> = ({ onEnterLogin }) => {
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               <div className="space-y-10 order-2 lg:order-1">
                  <div className="space-y-4">
-                    <h4 className="text-[10px] font-orbitron font-black text-cyan-500 uppercase tracking-[0.4em]">Capacidad Operativa</h4>
+                    <h4 className="text-[10px] font-orbitron font-black text-cyan-500 uppercase tracking-widest tracking-[0.4em]">Capacidad Operativa</h4>
                     <h3 className="text-4xl font-orbitron font-black text-white uppercase tracking-tighter">Inteligencia que <br/> Sincroniza con tus Ventas</h3>
                  </div>
                  
@@ -413,7 +412,7 @@ const Landing: React.FC<LandingProps> = ({ onEnterLogin }) => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-white/5 text-center">
-           <p className="text-[9px] font-orbitron font-black text-slate-700 uppercase tracking-[1em]">©2024 NEURONADS OS | OPTIMIZED BY AI</p>
+           <p className="text-[9px] font-orbitron font-black text-slate-700 uppercase tracking-[1em]">©2024 NEURONADS MX | OPTIMIZED BY AI</p>
         </div>
       </footer>
 
