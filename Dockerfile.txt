@@ -1,26 +1,49 @@
-FROM node:20-alpine
+# --- NEURONADS OS | DOCKER INFRASTRUCTURE ---
+# Nodo de Producción Optimizado para AdTech Scaling
 
-# Instalar dependencias necesarias para compatibilidad de librerías nativas
-RUN apk add --no-cache libc6-compat
+FROM node:20-alpine AS base
 
-# Establecer el directorio de trabajo
+# Instalación de dependencias del sistema para librerías nativas y herramientas de red
+RUN apk add --no-cache libc6-compat curl
+
+# Directorio de trabajo del Córtex NeuronAds
 WORKDIR /app
 
-# Copiar archivos de definición de dependencias
+# --- INSTALACIÓN DE DEPENDENCIAS ---
+# Copiamos solo los manifiestos primero para aprovechar la caché de Docker
 COPY package.json package-lock.json* ./
 
-# Instalar solo dependencias de producción para optimizar el tamaño de la imagen
-RUN npm install --production
+# Instalación limpia de dependencias de producción
+# Se omiten devDependencies para reducir el peso de la sinapsis del contenedor
+RUN npm ci --only=production
 
-# Copiar todo el código fuente del proyecto
+# --- DESPLIEGUE DE CÓDIGO ---
+# Copiamos el resto de los módulos y el código fuente
 COPY . .
 
-# Exponer el puerto 3000 (puerto por defecto del sistema)
-EXPOSE 3000
+# Seguridad: Cambiamos el dueño de los archivos al usuario 'node'
+RUN chown -R node:node /app
 
-# Configurar variables de entorno para producción
+# --- CONFIGURACIÓN DE ENTORNO ---
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Comando de inicio del nodo operativo NeuronAds
+# Variables de enlace (se recomienda pasarlas vía docker-compose o secretos)
+# API_KEY se inyecta externamente
+# DATABASE_URL se inyecta externamente
+# REDIS_URL se inyecta externamente
+
+# --- OPERATIVIDAD ---
+# Exponer el puerto de comunicación del Nodo Central
+EXPOSE 3000
+
+# Usuario no privilegiado para ejecución segura
+USER node
+
+# Healthcheck: Verificación periódica del estado del Córtex Central
+# Si el endpoint /api/health falla, el contenedor se marcará como UNHEALTHY
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Comando de inicio del Nodo Operativo NeuronAds
 CMD ["node", "server.js"]
