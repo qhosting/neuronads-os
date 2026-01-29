@@ -241,10 +241,32 @@ app.get('/api/clients', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.post('/api/clients', async (req, res) => {
+  const { name, type, status, fee, renewalDate, contractedServices } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO clients (name, type, status, fee, renewal_date, contracted_services, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
+      [name, type, status, fee, renewalDate, JSON.stringify(contractedServices)]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/projects', async (req, res) => {
   try {
     const result = await pool.query('SELECT p.*, c.name as client_name FROM projects p LEFT JOIN clients c ON p.client_id = c.id ORDER BY p.created_at DESC');
     res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/projects', async (req, res) => {
+  const { clientId, name, progress, synapseLevel, tasks, roadmap, feedbacks, status, progressImage } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO projects (client_id, name, progress, synapse_level, tasks, roadmap, feedbacks, status, progress_image, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW()) RETURNING *',
+      [clientId, name, progress || 0, synapseLevel || 50, JSON.stringify(tasks || []), JSON.stringify(roadmap || []), JSON.stringify(feedbacks || []), status || 'EXECUTING', progressImage]
+    );
+    res.status(201).json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

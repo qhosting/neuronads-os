@@ -12,9 +12,9 @@ Lista de características y mejoras pendientes por implementar para alcanzar la 
 -   [ ] **Validación:** Implementar validación de datos de entrada (ej. Zod o Joi) en todos los endpoints.
 
 ## 2. Frontend
--   [ ] **Conexión de Formularios:** Conectar los formularios de creación (Clientes, Proyectos) a sus respectivos endpoints de backend (actualmente algunos solo son visuales o faltan endpoints).
--   [ ] **Gestión de Estado Global:** Evaluar el uso de Context API o Redux para manejar el estado de usuario y datos compartidos de manera más robusta.
--   [ ] **Manejo de Errores:** Mejorar la retroalimentación al usuario en caso de fallos de red o errores de API.
+-   [x] **Conexión de Formularios:** Conectar los formularios de creación (Clientes, Proyectos) a sus respectivos endpoints de backend.
+-   [x] **Gestión de Estado Global:** Evaluar el uso de Context API o Redux para manejar el estado de usuario y datos compartidos de manera más robusta.
+-   [x] **Manejo de Errores:** Mejorar la retroalimentación al usuario en caso de fallos de red o errores de API.
 
 ## 3. DevOps & Calidad
 -   [ ] **Testing:**

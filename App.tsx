@@ -13,16 +13,18 @@ import Landing from './components/Landing';
 import Settings from './components/Settings';
 import AICortexAssistant from './components/AICortexAssistant';
 import { Shield, User as UserIcon, Crown, Briefcase, Settings as SettingsIcon, LayoutGrid, CalendarDays, ShoppingCart, FileText, Zap, Bell, Brain } from 'lucide-react';
+import { useApp } from './context/AppContext';
 
 type View = 'LANDING' | 'APP';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('LANDING');
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.DASHBOARD);
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null); // Removed local user state
+  const { user, login, notifications, addNotification } = useApp(); // Use global state
   const [isUplinkConnected, setIsUplinkConnected] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  // const [notifications, setNotifications] = useState<any[]>([]); // Removed local notifications
 
   // WebSocket Integration
   useEffect(() => {
@@ -37,14 +39,11 @@ const App: React.FC = () => {
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'NEW_TRANSACTION') {
-          const newNotif = {
-            id: Date.now(),
+          addNotification({
             title: 'FLUJO DE ABUNDANCIA',
             message: `Nueva venta: $${data.payload.total} de ${data.payload.clientName}`,
             type: 'TRANSACTION'
-          };
-          setNotifications(prev => [newNotif, ...prev]);
-          setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== newNotif.id)), 5000);
+          });
         }
       };
 
@@ -54,7 +53,7 @@ const App: React.FC = () => {
 
       return () => ws.close();
     }
-  }, [currentView]);
+  }, [currentView, addNotification]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000);
@@ -62,7 +61,7 @@ const App: React.FC = () => {
   }, []);
 
   const handleEnterLogin = (role: UserRole) => {
-    setUser({ id: 'USR-' + Math.random().toString(36).substr(2, 4).toUpperCase(), role, nodeName: 'ALPHA-NODE' });
+    login(role);
     setCurrentView('APP');
   };
 
@@ -178,11 +177,13 @@ const App: React.FC = () => {
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 50 }}
-                className="w-80 bg-slate-900 border border-cyan-500/30 p-5 rounded-2xl shadow-2xl backdrop-blur-xl pointer-events-auto"
+                className={`w-80 bg-slate-900 border p-5 rounded-2xl shadow-2xl backdrop-blur-xl pointer-events-auto ${n.type === 'ERROR' ? 'border-rose-500/50' : n.type === 'SUCCESS' ? 'border-emerald-500/50' : 'border-cyan-500/30'}`}
               >
                 <div className="flex items-center gap-3 mb-2">
-                   <div className="p-1.5 bg-cyan-500/10 text-cyan-400 rounded-lg"><Zap size={16} /></div>
-                   <h4 className="text-[10px] font-orbitron font-black text-white uppercase">{n.title}</h4>
+                   <div className={`p-1.5 rounded-lg ${n.type === 'ERROR' ? 'bg-rose-500/10 text-rose-500' : n.type === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-cyan-500/10 text-cyan-400'}`}>
+                      {n.type === 'ERROR' ? <Shield size={16} /> : n.type === 'SUCCESS' ? <Crown size={16} /> : <Zap size={16} />}
+                   </div>
+                   <h4 className={`text-[10px] font-orbitron font-black uppercase ${n.type === 'ERROR' ? 'text-rose-500' : n.type === 'SUCCESS' ? 'text-emerald-500' : 'text-white'}`}>{n.title}</h4>
                 </div>
                 <p className="text-[10px] text-slate-400 uppercase font-mono">{n.message}</p>
               </motion.div>

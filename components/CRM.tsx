@@ -1,15 +1,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, PlusCircle, ChevronDown, ChevronUp, ExternalLink, Filter, Building2, Globe, X, FileText, CreditCard, Zap, Download, Layers, Activity, ArrowRight } from 'lucide-react';
+import { Search, PlusCircle, ChevronDown, ChevronUp, ExternalLink, Filter, Building2, Globe, X, FileText, CreditCard, Zap, Download, Layers, Activity, ArrowRight, Save } from 'lucide-react';
 import { Client } from '../types';
+import { useApp } from '../context/AppContext';
 
 const CRM: React.FC = () => {
+  const { addNotification } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newClient, setNewClient] = useState({
+    name: '',
+    type: 'SATELLITE',
+    status: 'ACTIVE',
+    fee: 0,
+    renewalDate: new Date().toISOString().split('T')[0]
+  });
 
   useEffect(() => {
     fetchClients();
@@ -22,8 +32,27 @@ const CRM: React.FC = () => {
       setClients(data);
     } catch (error) {
       console.error('Error fetching clients:', error);
+      addNotification({ title: 'ERROR', message: 'Fallo al cargar clientes', type: 'ERROR' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateClient = async () => {
+    try {
+      const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newClient)
+      });
+      if (!response.ok) throw new Error('Error creating client');
+      const createdClient = await response.json();
+      setClients([createdClient, ...clients]);
+      setIsModalOpen(false);
+      addNotification({ title: 'ÉXITO', message: 'Nodo cliente vinculado', type: 'SUCCESS' });
+    } catch (error) {
+      console.error('Error creating client:', error);
+      addNotification({ title: 'ERROR', message: 'No se pudo crear el cliente', type: 'ERROR' });
     }
   };
 
@@ -46,7 +75,10 @@ const CRM: React.FC = () => {
           <h2 className="text-3xl font-orbitron font-bold metallic-text uppercase tracking-tight">Córtex de Clientes</h2>
           <p className="text-slate-500 text-xs font-mono uppercase tracking-[0.2em] mt-1">Nodos Operativos Reales en Tiempo Real</p>
         </div>
-        <button className="flex items-center gap-2 px-6 py-3 bg-cyan-500 text-slate-950 rounded-xl font-orbitron text-[10px] font-black hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-cyan-500 text-slate-950 rounded-xl font-orbitron text-[10px] font-black hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+        >
           <PlusCircle size={18} /> NUEVO VÍNCULO NEURAL
         </button>
       </div>
@@ -128,6 +160,80 @@ const CRM: React.FC = () => {
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-orbitron font-bold text-white uppercase">Nuevo Nodo Cliente</h3>
+                <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-white"><X size={24} /></button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-orbitron text-slate-500 uppercase">Razón Social</label>
+                  <input
+                    type="text"
+                    value={newClient.name}
+                    onChange={(e) => setNewClient({...newClient, name: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-cyan-500/50 outline-none"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-orbitron text-slate-500 uppercase">Tipo de Nodo</label>
+                    <select
+                      value={newClient.type}
+                      onChange={(e) => setNewClient({...newClient, type: e.target.value})}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-cyan-500/50 outline-none appearance-none"
+                    >
+                      <option value="SATELLITE">SATELLITE</option>
+                      <option value="EXTERNAL">EXTERNAL</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-orbitron text-slate-500 uppercase">Estado Inicial</label>
+                    <select
+                      value={newClient.status}
+                      onChange={(e) => setNewClient({...newClient, status: e.target.value})}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-cyan-500/50 outline-none appearance-none"
+                    >
+                      <option value="ACTIVE">ACTIVE</option>
+                      <option value="PAUSED">PAUSED</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-orbitron text-slate-500 uppercase">Fee Mensual</label>
+                    <input
+                      type="number"
+                      value={newClient.fee}
+                      onChange={(e) => setNewClient({...newClient, fee: Number(e.target.value)})}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-cyan-500/50 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-orbitron text-slate-500 uppercase">Renovación</label>
+                    <input
+                      type="date"
+                      value={newClient.renewalDate}
+                      onChange={(e) => setNewClient({...newClient, renewalDate: e.target.value})}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-white focus:border-cyan-500/50 outline-none"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={handleCreateClient}
+                  className="w-full py-4 mt-4 bg-cyan-500 text-slate-950 rounded-xl font-orbitron font-black hover:bg-cyan-400 transition-all shadow-lg flex justify-center items-center gap-2"
+                >
+                  <Save size={18} /> ESTABLECER ENLACE
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -26,8 +26,17 @@ import {
   Sparkles,
   Clock
 } from 'lucide-react';
-import { Type } from "@google/genai";
 import { Quotation, QuotationItem, UserRole, IncomingRequest, ServiceItem, PdfTemplateConfig } from '../types';
+
+/* Define Type enum locally to avoid importing from backend package */
+enum Type {
+  STRING = "STRING",
+  NUMBER = "NUMBER",
+  INTEGER = "INTEGER",
+  BOOLEAN = "BOOLEAN",
+  ARRAY = "ARRAY",
+  OBJECT = "OBJECT"
+}
 
 const CATALOG_ITEMS: ServiceItem[] = [
   { id: 's1', name: 'Arquitectura de Marca', description: 'Desarrollo de identidad corporativa basado en posicionamiento competitivo y análisis de mercado.', price: 1500, category: 'BRANDING', billingCycle: 'ONCE' },
