@@ -17,9 +17,9 @@ Lista de características y mejoras pendientes por implementar para alcanzar la 
 -   [x] **Manejo de Errores:** Mejorar la retroalimentación al usuario en caso de fallos de red o errores de API.
 
 ## 3. DevOps & Calidad
--   [ ] **Testing:**
+-   [x] **Testing:**
     -   Implementar pruebas unitarias para el backend (Jest/Supertest).
     -   Implementar pruebas de componentes para el frontend (React Testing Library).
--   [ ] **Redis:** Implementar caché efectiva para consultas frecuentes (ej. configuración, dashboard).
--   [ ] **CI/CD:** Configurar pipelines de despliegue automatizado.
--   [ ] **Variables de Entorno:** Refinar la gestión de variables para separar entornos de desarrollo y producción de manera segura.
+-   [x] **Redis:** Implementar caché efectiva para consultas frecuentes (ej. configuración, dashboard).
+-   [x] **CI/CD:** Configurar pipelines de despliegue automatizado.
+-   [x] **Variables de Entorno:** Refinar la gestión de variables para separar entornos de desarrollo y producción de manera segura.

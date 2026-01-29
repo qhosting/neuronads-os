@@ -218,8 +218,15 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/settings/:key', async (req, res) => {
   try {
+    const cacheKey = `settings:${req.params.key}`;
+    const cached = await redis.get(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
     const result = await pool.query('SELECT value FROM app_settings WHERE key = $1', [req.params.key]);
-    res.json(result.rows[0]?.value || {});
+    const value = result.rows[0]?.value || {};
+
+    await redis.setex(cacheKey, 3600, JSON.stringify(value)); // Cache for 1 hour
+    res.json(value);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -230,13 +237,19 @@ app.post('/api/settings', async (req, res) => {
       'INSERT INTO app_settings (key, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()',
       [key, JSON.stringify(value)]
     );
+    await redis.del(`settings:${key}`); // Invalidate cache
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/clients', async (req, res) => {
   try {
+    const cacheKey = 'all_clients';
+    const cached = await redis.get(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
     const result = await pool.query('SELECT * FROM clients ORDER BY created_at DESC');
+    await redis.setex(cacheKey, 300, JSON.stringify(result.rows)); // Cache for 5 mins
     res.json(result.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -248,6 +261,7 @@ app.post('/api/clients', async (req, res) => {
       'INSERT INTO clients (name, type, status, fee, renewal_date, contracted_services, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
       [name, type, status, fee, renewalDate, JSON.stringify(contractedServices)]
     );
+    await redis.del('all_clients'); // Invalidate cache
     res.status(201).json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
