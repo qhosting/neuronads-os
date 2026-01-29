@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const { Pool } = require('pg');
 const Redis = require('ioredis');
 const dotenv = require('dotenv');
+const { GoogleGenAI } = require('@google/genai');
 
 dotenv.config();
 
@@ -264,6 +265,102 @@ app.get('/api/leads', async (req, res) => {
     const result = await pool.query('SELECT * FROM incoming_requests ORDER BY created_at DESC');
     res.json(result.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- API DE COTIZACIONES (QUOTATIONS) ---
+app.get('/api/quotations', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM quotations ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/quotations', async (req, res) => {
+  const { id, clientName, title, items, total, status, aiJustification, terms } = req.body;
+  try {
+    // Upsert quotation
+    const query = `
+      INSERT INTO quotations (id, client_name, title, items, total, status, ai_justification, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      ON CONFLICT (id) DO UPDATE
+      SET client_name = $2, title = $3, items = $4, total = $5, status = $6, ai_justification = $7
+      RETURNING *
+    `;
+    const values = [id, clientName, title, JSON.stringify(items), total, status, aiJustification];
+    const result = await pool.query(query, values);
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/quotations/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM quotations WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- API DE CAMPAÑAS (CAMPAIGNS) ---
+app.get('/api/campaigns', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM campaigns ORDER BY last_sync DESC');
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/campaigns', async (req, res) => {
+  const { name, platform, budget, spent, status, roas } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO campaigns (name, platform, budget, spent, status, roas, last_sync) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *',
+      [name, platform, budget, spent, status, roas]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/campaigns/:id', async (req, res) => {
+  const { name, platform, budget, spent, status, roas } = req.body;
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'UPDATE campaigns SET name = $1, platform = $2, budget = $3, spent = $4, status = $5, roas = $6, last_sync = NOW() WHERE id = $7 RETURNING *',
+      [name, platform, budget, spent, status, roas, id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/campaigns/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM campaigns WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- PROXY DE INTELIGENCIA ARTIFICIAL (GOOGLE GENAI) ---
+app.post('/api/ai/generate', async (req, res) => {
+  const { prompt, model: modelName, config } = req.body;
+
+  if (!process.env.GEMINI_API_KEY && !process.env.API_KEY) {
+    return res.status(500).json({ error: 'API Key de IA no configurada en servidor.' });
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.API_KEY });
+
+    const response = await ai.models.generateContent({
+      model: modelName || "gemini-1.5-flash",
+      contents: prompt,
+      config: config || {}
+    });
+
+    // Adaptar respuesta para el frontend
+    const responseText = response.text;
+    res.json({ text: responseText });
+  } catch (err) {
+    console.error('[AI PROXY ERROR]', err);
+    res.status(500).json({ error: err.message || 'Error en generación de IA' });
+  }
 });
 
 app.get('*', (req, res) => {

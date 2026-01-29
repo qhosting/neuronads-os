@@ -3,12 +3,12 @@
 Lista de características y mejoras pendientes por implementar para alcanzar la versión estable completa.
 
 ## 1. Backend & API
--   [ ] **Persistencia de Cotizaciones:** Crear endpoints (POST, PUT, DELETE) para guardar las cotizaciones generadas en la base de datos (actualmente solo viven en el estado local del frontend).
--   [ ] **Gestión de Campañas:** Implementar endpoints CRUD para la tabla `campaigns`.
+-   [x] **Persistencia de Cotizaciones:** Crear endpoints (POST, PUT, DELETE) para guardar las cotizaciones generadas en la base de datos.
+-   [x] **Gestión de Campañas:** Implementar endpoints CRUD para la tabla `campaigns`.
 -   [ ] **Autenticación y Seguridad:**
     -   Reemplazar el sistema de login simulado por autenticación real (JWT/OAuth).
     -   Middleware de protección de rutas.
--   [ ] **Proxy de IA:** Mover la lógica de Google GenAI al backend para proteger la API Key y centralizar el control de uso.
+-   [x] **Proxy de IA:** Mover la lógica de Google GenAI al backend para proteger la API Key y centralizar el control de uso.
 -   [ ] **Validación:** Implementar validación de datos de entrada (ej. Zod o Joi) en todos los endpoints.
 
 ## 2. Frontend

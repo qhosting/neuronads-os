@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Facebook, 
@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Copy
 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { PlatformStatus, Campaign, UserRole } from '../types';
 
 const PLATFORMS: PlatformStatus[] = [
@@ -22,26 +21,32 @@ const PLATFORMS: PlatformStatus[] = [
   { name: 'TikTok Marketing API', status: 'DEGRADED', latency: '210ms' },
 ];
 
-const ACTIVE_CAMPAIGNS: Campaign[] = [
-  { id: '1', name: 'Inmobiliaria Conversión V2', platform: 'META', budget: 5000, spent: 3200, status: 'ACTIVE', roas: 5.2 },
-  { id: '2', name: 'Búsqueda Hipotecas - Broad', platform: 'GOOGLE', budget: 2000, spent: 1850, status: 'LEARNING', roas: 3.1 },
-  { id: '3', name: 'Viral Hook 01 - Branding', platform: 'TIKTOK', budget: 1500, spent: 450, status: 'ACTIVE', roas: 2.8 },
-];
-
 const CampaignCortex: React.FC<{ userRole?: UserRole }> = ({ userRole }) => {
   const isClient = userRole === UserRole.CLIENT;
   const [aiGenerating, setAiGenerating] = useState(false);
   const [generatedCopy, setGeneratedCopy] = useState('');
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+
+  useEffect(() => {
+    fetch('/api/campaigns')
+      .then(res => res.json())
+      .then(data => setCampaigns(data))
+      .catch(err => console.error('Error fetching campaigns:', err));
+  }, []);
 
   const generateNeuralCopy = async () => {
     setAiGenerating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: "Genera un copy publicitario disruptivo para Meta Ads de una inmobiliaria de lujo. Usa psicología de escasez, lenguaje neural de alto impacto y termina con un llamado a la acción magnético. En español.",
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: "Genera un copy publicitario disruptivo para Meta Ads de una inmobiliaria de lujo. Usa psicología de escasez, lenguaje neural de alto impacto y termina con un llamado a la acción magnético. En español.",
+          model: 'gemini-1.5-flash'
+        })
       });
-      setGeneratedCopy(response.text || "Fallo en la síntesis creativa.");
+      const data = await response.json();
+      setGeneratedCopy(data.text || "Fallo en la síntesis creativa.");
     } catch (error) {
       setGeneratedCopy("Error: Nodo de IA desconectado.");
     } finally {
@@ -119,7 +124,9 @@ const CampaignCortex: React.FC<{ userRole?: UserRole }> = ({ userRole }) => {
             <span className="text-[10px] text-slate-500 font-mono">Grabovoi Active: 212 585 212</span>
           </div>
           <div className="space-y-8">
-            {ACTIVE_CAMPAIGNS.map(camp => (
+            {campaigns.length === 0 ? (
+              <div className="text-center text-slate-500 font-mono text-xs py-10">SINCRONIZANDO NODOS DE CAMPAÑAS...</div>
+            ) : campaigns.map(camp => (
               <div key={camp.id} className="space-y-4">
                 <div className="flex justify-between items-end">
                   <div className="flex items-center gap-3">

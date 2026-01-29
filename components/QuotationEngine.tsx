@@ -26,7 +26,7 @@ import {
   Sparkles,
   Clock
 } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
 import { Quotation, QuotationItem, UserRole, IncomingRequest, ServiceItem, PdfTemplateConfig } from '../types';
 
 const CATALOG_ITEMS: ServiceItem[] = [
@@ -74,6 +74,11 @@ const QuotationEngine: React.FC<{ userRole?: UserRole }> = ({ userRole }) => {
   const [newQtJustification, setNewQtJustification] = useState('');
 
   useEffect(() => {
+    fetch('/api/quotations')
+      .then(res => res.json())
+      .then(data => setQuotations(data))
+      .catch(err => console.error('Error fetching quotations:', err));
+
     const loadConfig = () => {
       const saved = localStorage.getItem('neuron_pdf_config');
       if (saved) setPdfConfig(JSON.parse(saved));
@@ -89,38 +94,49 @@ const QuotationEngine: React.FC<{ userRole?: UserRole }> = ({ userRole }) => {
     setNewQtTitle(`Propuesta Técnica: ${req.clientName}`);
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const prompt = `Analiza este requerimiento: "${req.message}". Genera una selección de servicios comerciales del catálogo: ${CATALOG_ITEMS.map(i => `${i.name} ($${i.price})`).join(', ')}. Devuelve un JSON array de objetos con "name", "price", "description" y "quantity".`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                price: { type: Type.NUMBER },
-                description: { type: Type.STRING },
-                quantity: { type: Type.NUMBER }
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          model: 'gemini-1.5-flash',
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING },
+                  price: { type: Type.NUMBER },
+                  description: { type: Type.STRING },
+                  quantity: { type: Type.NUMBER }
+                }
               }
             }
           }
-        }
+        })
       });
 
-      const items = JSON.parse(response.text || '[]');
+      const data = await response.json();
+      const items = JSON.parse(data.text || '[]');
       setNewQtItems(items.map((i: any) => ({ ...i, id: Math.random().toString(36).substr(2, 9) })));
       setRequests(prev => prev.map(r => r.id === req.id ? { ...r, processed: true } : r));
       
-      const justificationResponse = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `Redacta un resumen ejecutivo formal de 3 líneas para: ${items.map((i: any) => i.name).join(', ')}. Enfoque: ROI y Eficiencia Operativa. Sin misticismos.`
+      const justPrompt = `Redacta un resumen ejecutivo formal de 3 líneas para: ${items.map((i: any) => i.name).join(', ')}. Enfoque: ROI y Eficiencia Operativa. Sin misticismos.`;
+      const justResponse = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: justPrompt,
+          model: 'gemini-1.5-flash'
+        })
       });
-      setNewQtJustification(justificationResponse.text || '');
+      const justData = await justResponse.json();
+
+      setNewQtJustification(justData.text || '');
       setIsModalOpen(true);
     } catch (error) {
       console.error("Falla en motor IA:", error);
@@ -129,7 +145,7 @@ const QuotationEngine: React.FC<{ userRole?: UserRole }> = ({ userRole }) => {
     }
   };
 
-  const createQuotation = () => {
+  const createQuotation = async () => {
     const qt: Quotation = {
       id: `QT-${Math.floor(1000 + Math.random() * 9000)}`,
       clientId: 'EXT-NODE',
@@ -142,7 +158,22 @@ const QuotationEngine: React.FC<{ userRole?: UserRole }> = ({ userRole }) => {
       aiJustification: newQtJustification,
       terms: pdfConfig.terms
     };
-    setQuotations([qt, ...quotations]);
+
+    try {
+      await fetch('/api/quotations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(qt)
+      });
+      // Refresh list
+      const res = await fetch('/api/quotations');
+      const data = await res.json();
+      setQuotations(data);
+    } catch (err) {
+      console.error('Error creating quotation:', err);
+      setQuotations([qt, ...quotations]); // Fallback optimistic
+    }
+
     setIsModalOpen(false);
     resetForm();
   };

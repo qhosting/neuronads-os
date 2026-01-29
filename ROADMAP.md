@@ -37,6 +37,9 @@ Este documento detalla el estado actual del proyecto y la arquitectura implement
     -   `POST /api/transactions`: Registro de transacciones con broadcast WebSocket.
     -   `GET /api/leads`: Listado de solicitudes entrantes.
     -   `GET/POST /api/settings`: Gestión de configuración.
+    -   `GET/POST/DELETE /api/quotations`: Gestión de cotizaciones.
+    -   `GET/POST/PUT/DELETE /api/campaigns`: Gestión de campañas.
+    -   `POST /api/ai/generate`: Proxy seguro para IA (Google GenAI).
 
 ## 3. Integraciones
 -   **Google GenAI:** Integrado en el frontend para generación de justificaciones en cotizaciones.
