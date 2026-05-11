@@ -109,12 +109,12 @@ const AurumUplink: React.FC<{ onConnect: () => void, isConnected: boolean }> = (
         <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 backdrop-blur-sm shadow-xl flex flex-col">
           <h3 className="font-orbitron font-bold metallic-text uppercase text-sm tracking-widest mb-6">Uplink Activity Log</h3>
           <div className="flex-1 font-mono text-[9px] text-slate-500 space-y-2 uppercase">
-            <p className="text-cyan-400/70">> [08:42:11] n8n: Trigger "New Lead" detectado en Meta Ads.</p>
-            <p className="text-emerald-400/70">> [08:42:13] Chatwoot: Conversación iniciada en Nodo #442.</p>
-            <p className="text-slate-600">> [08:45:01] System: Heartbeat 8888 exitoso.</p>
-            <p className="text-cyan-400/70">> [08:48:22] n8n: Pipeline de calificación de lead completado.</p>
-            <p className="text-amber-400/70">> [08:50:11] Chatwoot: Latencia elevada en canal TikTok.</p>
-            <p className="text-slate-600">> [08:52:00] Aurum: Sincronización de facturación completada.</p>
+            <p className="text-cyan-400/70">{'>'} [08:42:11] n8n: Trigger "New Lead" detectado en Meta Ads.</p>
+            <p className="text-emerald-400/70">{'>'} [08:42:13] Chatwoot: Conversación iniciada en Nodo #442.</p>
+            <p className="text-slate-600">{'>'} [08:45:01] System: Heartbeat 8888 exitoso.</p>
+            <p className="text-cyan-400/70">{'>'} [08:48:22] n8n: Pipeline de calificación de lead completado.</p>
+            <p className="text-amber-400/70">{'>'} [08:50:11] Chatwoot: Latencia elevada en canal TikTok.</p>
+            <p className="text-slate-600">{'>'} [08:52:00] Aurum: Sincronización de facturación completada.</p>
           </div>
           <div className="mt-8 p-4 bg-slate-950/80 border border-slate-800 rounded-xl">
              <div className="flex justify-between items-center text-[10px] font-orbitron">
