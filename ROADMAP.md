@@ -1,46 +1,60 @@
-# Roadmap del Proyecto NeuronAds OS
+# 🧠 ROADMAP CONSOLIDADO - NeuronAds OS
+### Visión General del Proyecto | Version 2.0.0-stable
 
-Este documento detalla el estado actual del proyecto y la arquitectura implementada.
+**Proyecto**: NeuronAds OS - Córtex Operativo para AdTech  
+**Última Actualización**: 2026-05-10  
+**Lead Architect**: Aurum Clean Code DevOps Team  
 
-## 1. Arquitectura General
--   **Frontend:** Desarrollado en React utilizando Vite, TypeScript y TailwindCSS.
--   **Backend:** Servidor Node.js con Express.
--   **Base de Datos:** PostgreSQL para persistencia de datos (Córtex Persistente).
--   **Cache:** Configuración inicial de Redis (Sinapsis Rápida).
--   **Tiempo Real:** Implementación de WebSockets para notificaciones de transacciones.
+---
 
-## 2. Módulos Implementados
+## 📊 RESUMEN EJECUTIVO
+NeuronAds OS es un sistema integral de gestión para agencias de publicidad digital (AdTech), que combina CRM, gestión de proyectos, automatización de cotizaciones con IA y monitoreo de campañas en tiempo real. El sistema está diseñado sobre una arquitectura resiliente con cache de Redis y persistencia en PostgreSQL.
 
-### Frontend
--   **Dashboard:** Vista general del sistema.
--   **CRM (Córtex de Clientes):** Visualización de clientes (conectado a API).
--   **ProjectCore:** Gestión de proyectos (conectado a API).
--   **QuotationEngine:** Generador de cotizaciones con integración de IA (Google GenAI).
--   **CampaignCortex:** Visualización de campañas publicitarias.
--   **SalesPOS:** Punto de venta para transacciones rápidas.
--   **AurumUplink:** Centro de notificaciones y estado de conexión.
--   **Settings:** Configuración del sistema (conectado a API).
+---
 
-### Backend (API REST & WebSocket)
--   **Base de Datos:** Migraciones automáticas al inicio (`initDB`) para tablas:
-    -   `clients`
-    -   `projects`
-    -   `transactions`
-    -   `quotations`
-    -   `incoming_requests`
-    -   `campaigns`
-    -   `app_settings`
--   **Endpoints Funcionales:**
-    -   `GET /api/health`: Estado del servidor.
-    -   `GET /api/clients`: Listado de clientes.
-    -   `GET /api/projects`: Listado de proyectos.
-    -   `POST /api/transactions`: Registro de transacciones con broadcast WebSocket.
-    -   `GET /api/leads`: Listado de solicitudes entrantes.
-    -   `GET/POST /api/settings`: Gestión de configuración.
-    -   `GET/POST/DELETE /api/quotations`: Gestión de cotizaciones.
-    -   `GET/POST/PUT/DELETE /api/campaigns`: Gestión de campañas.
-    -   `POST /api/ai/generate`: Proxy seguro para IA (Google GenAI).
+## ✅ LOGROS Y FUNCIONALIDADES (Completado)
 
-## 3. Integraciones
--   **Google GenAI:** Integrado en el frontend para generación de justificaciones en cotizaciones.
--   **WebSocket:** Sistema de transmisión de eventos en tiempo real (ej. nuevas ventas).
+### 🏗️ Arquitectura e Infraestructura
+- [x] **Frontend SPA**: React 19 + TypeScript + Vite 7 (Bundling ultra-rápido).
+- [x] **Backend REST**: Node.js + Express + WebSocket (Comunicación en tiempo real).
+- [x] **Persistencia**: PostgreSQL (Esquema normalizado) + Redis (Capa de caché de alto rendimiento).
+- [x] **IA Integrada**: Google Gemini AI para generación de cotizaciones y asistente virtual.
+- [x] **DevOps**: Dockerización optimizada (Alpine), CI/CD con GitHub Actions y Testing Suite (Vitest/Jest).
+
+### 💼 Módulos de Negocio
+- [x] **CRM (Córtex de Clientes)**: Gestión completa de clientes corporativos.
+- [x] **ProjectCore**: Roadmap dinámico y gestión de tareas por proyecto.
+- [x] **QuotationEngine**: Generador de cotizaciones inteligente con IA.
+- [x] **CampaignCortex**: Monitoreo de métricas (ROAS, Budget) de campañas publicitarias.
+- [x] **SalesPOS**: Punto de venta con sincronización WebSocket en tiempo real.
+
+---
+
+## 🔴 TAREAS CRÍTICAS Y PRÓXIMOS PASOS
+
+### 🛡️ Seguridad y Estabilidad (Prioridad Alta)
+- [ ] **🔐 Autenticación Real**: Reemplazar Mocks por JWT/OAuth2.0 con refresh tokens.
+- [ ] **🔒 Validación Zod**: Implementar esquemas de validación en todos los endpoints del backend.
+- [ ] **🔑 Gestión de Secrets**: Migrar credenciales hardcoded a un sistema de gestión segura (Vault/AWS Secrets).
+- [ ] **📊 Error Handling**: Implementar un Error Handler global y Sentry para monitoreo de producción.
+
+### 🚀 Optimización y Features Post-MVP
+- [ ] **📈 Paginación Avanzada**: Implementar infinite scroll y búsqueda en todos los listados de la API.
+- [ ] **📲 Sistema de Notificaciones**: Email (SendGrid) y Push Notifications (Service Workers).
+- [ ] **🏢 Multi-Empresa**: Soporte para múltiples organizaciones en una misma instancia.
+- [ ] **🌙 UI/UX**: Implementación de Modo Oscuro e Internacionalización (i18n).
+
+---
+
+## 🗓️ HISTORIAL DE ESTABILIZACIÓN
+
+| Fecha | Hito | Estado |
+|-------|------|--------|
+| 2026-02-01 | Auditoría inicial de Clean Code | ✅ |
+| 2026-05-10 | **Consolidación de Estructura** | ✅ |
+| | - Fusión de Roadmaps (Done + TODO) | |
+| | - Limpieza de Dockerfiles redundantes | |
+| | - Protección de variables de entorno (.gitignore) | |
+
+---
+**Lead Architect**: DevOps Team | **Normativa**: Aurum Clean Code Standards
