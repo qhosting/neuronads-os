@@ -169,12 +169,11 @@
 - **Baja Prioridad**: ~5+ semanas
 
 ### Próximo Sprint Recomendado (2 semanas):
-1. ✅ Sistema de autenticación JWT
-2. ✅ Validación de inputs (Zod)
-3. ✅ RBAC y permisos
-4. ✅ Error handling global
-5. ✅ Completar testing suite (80% coverage)
-6. ✅ Docker Compose para desarrollo
+1. ✅ Sistema de construcción optimizado (Vite + Dist)
+2. ✅ Docker Multi-stage para producción
+3. ⏳ Sistema de autenticación JWT
+4. ⏳ Validación de inputs (Zod)
+5. ⏳ RBAC y permisos
 
 ---
 
